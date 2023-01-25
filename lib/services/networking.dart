@@ -7,7 +7,7 @@ class NetworkHelper {
 
   NetworkHelper(this.url);
 
-  Future getWeather() async {
+  Future<dynamic> getWeather() async {
     http.Response response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       // print(response.body);

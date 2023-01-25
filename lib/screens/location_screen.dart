@@ -1,3 +1,4 @@
+import 'package:clima/screens/city_screen.dart';
 import 'package:clima/services/weather.dart';
 import 'package:clima/utilities/constants.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +21,17 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
-    print(widget.locationWeather);
     updateUI(widget.locationWeather);
   }
 
   void updateUI(dynamic weatherData) {
     setState(() {
+      if (weatherData == null) {
+        userCity = '';
+        userTemp = 0;
+        userTextTemp = 'Error';
+        return;
+      }
       userCity = weatherData['name'];
       var condition = weatherData['weather'][0]['id'];
       userCondition = weatherModel.getWeatherIcon(condition);
@@ -56,14 +62,28 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var weatherData = await weatherModel.getWeatherData();
+                      updateUI(weatherData);
+                    },
                     child: Icon(
                       Icons.near_me,
                       size: 50.0,
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var cityName = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) {
+                          return CityScreen();
+                        }),
+                      );
+                      print(cityName);
+                      var weatherData =
+                          await weatherModel.getCityData(cityName);
+                      updateUI(weatherData);
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -81,7 +101,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                     Text(
                       userCondition,
-                      style: kConditionTextStyle,
+                      style: kConditionTextStyle.copyWith(fontSize: 78.0),
                     ),
                   ],
                 ),
